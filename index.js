@@ -1,11 +1,11 @@
 //import express from 'express';
 //import mongoose from 'mongoose';
 //import path from 'path';
-import express, { static } from 'express';
-import { connect } from 'mongoose';
-import { join } from 'path';
+var express = require('express');
+var mongoose = require('mongoose');
+var path = require('path');
 //var MessageSchema = require('./Models/MessageModel');
-import Message, { find } from './Models/MessageModel';
+const Message = require('./Models/MessageModel');
 
 //import {MessageSchema} from '../Models/MessageModel';
 
@@ -21,7 +21,7 @@ const uri = process.env.MONGODB_URI;
 mongodb+srv://sa:Windo@1234@chatappdb.lelyn.mongodb.net/test
 */
 const connection = "mongodb+srv://sa:Windo@1234@chatappdb.lelyn.mongodb.net/test";
-connect(connection,{ useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false})
+mongoose.connect(connection,{ useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false})
     .then(() => console.log("Database Connected Successfully"))
     .catch(err => console.log("Failed to connect to database " + err));
 
@@ -39,16 +39,16 @@ connect(connection,{ useNewUrlParser: true, useUnifiedTopology: true, useFindAnd
   // app.get('*', (req,res) => { 
   //   res.sendFile(path.join(__dirname, '..', 'frontend', 'build','index.html'))
   // });
-  app.use(static(join(__dirname, '../public')));
+  app.use(express.static(path.join(__dirname, '../public')));
   app.get('*', (req,res) => { 
-    res.sendFile(join(__dirname,'../public','index.html'))
+    res.sendFile(path.join(__dirname,'../public','index.html'))
   });
 }  
 
 io.on('connection', (socket) => {
 
   // Get the last 10 messages from the database.
-  find().sort({createdAt: -1}).limit(10).exec((err, messages) => {
+  Message.find().sort({createdAt: -1}).limit(10).exec((err, messages) => {
     if (err) return console.log(err);
 
     // Send the last messages to the user.
